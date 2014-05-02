@@ -113,6 +113,8 @@ module Confluence # :nodoc:
     # Security token.
     attr_reader :token
 
+    attr_accessor :confluence
+
     # Create new Confluence client.
     #
     # Params:
@@ -125,7 +127,7 @@ module Confluence # :nodoc:
       # http://stackoverflow.com/questions/4748633/how-can-i-make-rubys-xmlrpc-client-ignore-ssl-certificate-errors
       @server.instance_variable_get(:@http).instance_variable_set(:@verify_mode, OpenSSL::SSL::VERIFY_NONE)
       #@server.timeout = 305                          # XXX 
-      @confluence     = @server.proxy('confluence1')  # XXX
+      @confluence     = @server.proxy('confluence2')  # XXX
 
       @error          = nil
       @password       = nil
@@ -225,6 +227,48 @@ module Confluence # :nodoc:
       nil
     end
 
+    # Return Confluence space hash or nil.
+    #
+    # Params:
+    # +key+:: Fetch pages for a given space.
+    def get_pages(key)
+      pages = getPages(key)
+      return pages if ok?
+      nil
+    end
+
+    # Return Confluence space hash or nil, look up by pageId.
+    #
+    # Params:
+    # +page_id+:: Page Id.
+    def get_page_by_id(page_id)
+      page = getPage(page_id)
+      return page if ok?
+      nil
+    end
+
+    # Return Confluence page hash or nil.
+    #
+    # Params:
+    # +space+:: Space name.
+    # +title+:: Title name.
+    def get_page(space, title)
+      page = getPage(space, title)
+      return page if ok?
+      nil
+    end
+
+    # Return Confluence update page.
+    #
+    # Params:
+    # +page+:: Page Hash
+    def update_page(page)
+      updatePage(page, {})
+      return ok?
+      #return true if ok?
+      #nil
+    end
+
     # Return Confluence user hash or nil.
     #
     # Params:
@@ -266,6 +310,8 @@ module Confluence # :nodoc:
       end
       begin
         @error = nil
+        puts "Sending: %s" % method_name
+        pp args
         return @confluence.send( method_name, *( [@token] + args ) )  
       rescue XMLRPC::FaultException => e
         @error = tidy_exception( e.faultString )
