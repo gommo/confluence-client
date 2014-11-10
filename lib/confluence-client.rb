@@ -228,8 +228,8 @@ module Confluence # :nodoc:
     end
 
     # adds or updates a page.
-    def store_page(key, title, contents)
-		page = storePage( { 'space' => key, 'title' => title, 'contents' => contents } )
+    def store_page(key, title, contents, parent)
+		page = storePage( { 'space' => key, 'title' => title, 'contents' => contents, 'parentId' => parent } )
         return page if ok?
         nil
     end
