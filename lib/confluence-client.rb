@@ -2,19 +2,19 @@ require 'xmlrpc/client'
 
 module Confluence # :nodoc:
   # = Confluence::Client - Ruby client for the Confluence XML::RPC API.
-  # 
+  #
   # == Usage
   #
   #   Confluence::Client.new(url) do |confluence|
-  #     
+  #
   #     if confluence.login(user, pass)
-  #       
+  #
   #       # Was last API call successful?
   #       confluence.ok?
   #
   #       # Print error message if error on last API call.
   #       puts confluence.error if confluence.error?
-  #       
+  #
   #       ##########
   #       # Spaces #
   #       ##########
@@ -29,13 +29,13 @@ module Confluence # :nodoc:
   #           puts "unable to create space: #{c.error}"
   #         end
   #       end
-  #       
+  #
   #       if confluence.remove_space('foo')
   #         puts 'removed space'
   #       else
   #         puts "unable to remove space: #{c.error}"
   #       end
-  #       
+  #
   #       #########
   #       # Users #
   #       #########
@@ -43,15 +43,15 @@ module Confluence # :nodoc:
   #       if user
   #         puts "found user: #{user.inspect}"
   #       else
-  #         user = confluence.add_user( 'stan', 'stan has a name', 'stan@example.com' )       
+  #         user = confluence.add_user( 'stan', 'stan has a name', 'stan@example.com' )
   #       end
-  #       
+  #
   #       if confluence.remove_user('stan')
   #         puts 'removed user'
   #       else
   #         puts "unable to remove user: #{c.error}"
   #       end
-  #       
+  #
   #       #########
   #       # Users #
   #       #########
@@ -67,7 +67,7 @@ module Confluence # :nodoc:
   #       else
   #         puts "unable to remove group: #{c.error}"
   #       end
-  #       
+  #
   #       ##########
   #       # Groups #
   #       ##########
@@ -84,7 +84,7 @@ module Confluence # :nodoc:
   #           puts "unable to add user to group: #{c.error}"
   #         end
   #       end
-  #       
+  #
   #       ###############
   #       # Permissions #
   #       ###############
@@ -98,14 +98,14 @@ module Confluence # :nodoc:
   #       else
   #         puts "unable to remove permission from space: #{c.error}"
   #       end
-  #       
-  #       ########## 
+  #
+  #       ##########
   #       # Logout #
-  #       ########## 
+  #       ##########
   #       confluence.logout
   #     end
   #
-  #   end 
+  #   end
   class Client
 
     # Error message from last request (if any).
@@ -126,7 +126,7 @@ module Confluence # :nodoc:
       # TODO Ugly, ugly hack!
       # http://stackoverflow.com/questions/4748633/how-can-i-make-rubys-xmlrpc-client-ignore-ssl-certificate-errors
       @server.instance_variable_get(:@http).instance_variable_set(:@verify_mode, OpenSSL::SSL::VERIFY_NONE)
-      #@server.timeout = 305                          # XXX 
+      #@server.timeout = 305                          # XXX
       @confluence     = @server.proxy('confluence2')  # XXX
 
       @error          = nil
@@ -154,7 +154,7 @@ module Confluence # :nodoc:
     # +entity+:: User or group name.
     # +space+:: Space key.
     def add_permission_to_space(permission, entity, space)
-      addPermissionToSpace(permission, entity, space)      
+      addPermissionToSpace(permission, entity, space)
     end
 
     # Add user to group.  Returns boolean.
@@ -183,7 +183,7 @@ module Confluence # :nodoc:
       else
         @error = 'space keys may only contain [a-zA-Z0-9]'
       end
-      nil 
+      nil
     end
 
     # Create Confluence user.  Return user hash or nil.
@@ -226,6 +226,14 @@ module Confluence # :nodoc:
       return space if ok?
       nil
     end
+
+    # adds or updates a page.
+    def store_page(key, title, contents)
+		page = storePage( { 'space' => key, 'title' => title, 'contents' => contents } )
+        return page if ok?
+        nil
+    end
+
 
     # Return Confluence space hash or nil.
     #
@@ -312,7 +320,7 @@ module Confluence # :nodoc:
         @error = nil
         puts "Sending: %s" % method_name
         pp args
-        return @confluence.send( method_name, *( [@token] + args ) )  
+        return @confluence.send( method_name, *( [@token] + args ) )
       rescue XMLRPC::FaultException => e
         @error = tidy_exception( e.faultString )
       rescue Exception => e
@@ -342,7 +350,7 @@ module Confluence # :nodoc:
     # +entity+:: User or group name.
     # +space+:: Space key.
     def remove_permission_from_space(permission, entity, space)
-      removePermissionFromSpace(permission, entity, space)      
+      removePermissionFromSpace(permission, entity, space)
     end
 
     # Remove Confluence space.  Returns boolean.
