@@ -270,8 +270,9 @@ module Confluence # :nodoc:
     #
     # Params:
     # +page+:: Page Hash
-    def update_page(page)
-      updatePage(page, {})
+    # +options+:: Options Hash
+    def update_page(page, options = {})
+      updatePage(page, options)
       return ok?
       #return true if ok?
       #nil
