@@ -32,6 +32,22 @@
       else
         puts "unable to remove space: #{c.error}"
       end
+
+      #########
+      # Pages #
+      #########
+      page = confluence.get_page('space name', 'page name')
+      if page
+        puts "page id: #{page}"
+
+        page['content'] = page['content'] + '<br /><h3>test message :)</h3>'
+        options = {'minorEdit' => 'false', 'versionComment' => 'add test message'}
+        if confluence.update_page(page, options)
+            puts 'update success'
+        else
+            puts 'update failed'
+        end
+      end
       
       #########
       # Users #
